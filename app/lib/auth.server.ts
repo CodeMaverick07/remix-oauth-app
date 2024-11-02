@@ -17,6 +17,7 @@ const registerFormStratergy = new FormStrategy(async ({ form }) => {
       email: email as string,
     },
   });
+
   if (!user) {
     try {
       const user = db.user.create({
@@ -29,10 +30,11 @@ const registerFormStratergy = new FormStrategy(async ({ form }) => {
       return user;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      throw new AuthorizationError(error);
+      console.log(error);
     }
   } else {
-    throw new AuthorizationError("user already exits");
+    throw new AuthorizationError("user alredy exits");
+    return;
   }
 });
 
@@ -45,16 +47,15 @@ const loginFormStratergy = new FormStrategy(async ({ form }) => {
       email: email as string,
     },
   });
+
   if (!user) {
-    throw new AuthorizationError("user dose not exits");
+    throw new AuthorizationError("User does not exist.");
+  } else if (user.provider !== "form") {
+    throw new AuthorizationError("User exists with a different login method.");
+  } else if (user.password !== password) {
+    throw new AuthorizationError("Password does not match.");
   } else {
-    if (user.password == password && user.email == email) {
-      return user;
-    } else {
-      console.log(user, "user");
-      console.log(password, "and", user.password);
-      throw new AuthorizationError("password dose not match");
-    }
+    return user;
   }
 });
 

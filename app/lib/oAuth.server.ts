@@ -15,15 +15,12 @@ const gitHubStrategy = new GitHubStrategy(
     redirectURI: process.env.GITHUB_CALLBACK_URL!,
   },
   async ({ profile }) => {
-    console.log("GitHub Profile:", profile);
     const user = await db.user.findUnique({
       // Make sure to await this
       where: {
         email: profile.emails[0].value as string,
       },
     });
-
-    console.log("Found User:", user); // Log the found user
 
     if (!user) {
       try {
@@ -34,7 +31,7 @@ const gitHubStrategy = new GitHubStrategy(
             provider: "github",
           },
         });
-        console.log("Created New User:", newUser); // Log the newly created user
+        // Log the newly created user
         return newUser;
       } catch (error: any) {
         console.error("Error creating user:", error); // Log error for debugging
