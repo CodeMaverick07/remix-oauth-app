@@ -26,7 +26,6 @@ import {
 import { registerAuthenticator } from "~/lib/auth.server";
 import { authChecker } from "~/utils/AuthCheck";
 import { validateInput } from "~/lib/utils";
-import { AuthorizationError } from "remix-auth";
 
 const formSchema = z.object({
   name: z
@@ -51,25 +50,17 @@ export const action: ActionFunction = async ({
   const email = form.get("email");
   const password = form.get("password");
 
-  try {
-    const result = formSchema.safeParse({ name, email, password });
-    if (result.success) {
-      const user = await registerAuthenticator.authenticate("form", request, {
-        successRedirect: "/",
-        throwOnError: true,
-      });
-      return user;
-    } else {
-      console.log("into the error else");
-      const errors = validateInput(result.error);
-      return json(errors);
-    }
-  } catch (error) {
-    if (error instanceof AuthorizationError) {
-      return json({ error: error.message }, { status: 401 });
-    }
-    console.log(error);
-    return json({ error: "user alredy exits" });
+  const result = formSchema.safeParse({ name, email, password });
+  if (result.success) {
+    const user = await registerAuthenticator.authenticate("form", request, {
+      successRedirect: "/",
+      throwOnError: true,
+    });
+    return user;
+  } else {
+    console.log("into the error else");
+    const errors = validateInput(result.error);
+    return json(errors);
   }
 };
 
