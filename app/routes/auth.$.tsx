@@ -6,26 +6,26 @@ export async function loader({ params, request }: ActionFunctionArgs) {
   switch (value) {
     case "github": {
       return gitHubAuthenticator.authenticate("github", request, {
-        successRedirect: "/", // Redirect to home on successful authentication
-        failureRedirect: "/sign-in", // Redirect to sign-in on failure
+        successRedirect: "/",
+        failureRedirect: "/sign-in",
       });
     }
     case "github/callback": {
       return gitHubAuthenticator.authenticate("github", request, {
-        successRedirect: "/", // Where to redirect on success
-        failureRedirect: "/sign-in", // Where to redirect if authentication fails
+        successRedirect: "/",
+        failureRedirect: "/sign-in",
       });
     }
     case "google": {
       return googleAuthenticator.authenticate("google", request, {
-        successRedirect: "/", // Redirect to home page on success
-        failureRedirect: "/sign-in", // Redirect to sign-in on failure
+        successRedirect: "/",
+        failureRedirect: "/sign-in",
       });
     }
     case "google/callback": {
       return googleAuthenticator.authenticate("google", request, {
-        successRedirect: "/", // Redirect to home page on success
-        failureRedirect: "/sign-in", // Redirect to sign-in on failure
+        successRedirect: "/",
+        failureRedirect: "/sign-in",
       });
     }
   }
