@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Link, Form, useActionData } from "@remix-run/react";
+import {
+  Link,
+  Form,
+  useActionData,
+  useRouteError,
+  isRouteErrorResponse,
+} from "@remix-run/react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 
@@ -26,6 +32,35 @@ import {
 import { loginAuthenticator } from "~/lib/auth.server";
 import { authChecker } from "~/utils/AuthCheck";
 import { validateInput } from "~/lib/utils";
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="w-full h-screen flex flex-col justify-center items-center">
+        <h1 className=" font-bold text-5xl text-red-700">
+          {error.status} {error.statusText}
+        </h1>
+        <p className="font-semibold text-xl">{error.data.message}</p>
+        <Link to={"/sign-in"} className="text-semibold">
+          try again
+        </Link>
+      </div>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <div className="flex h-screen w-screen justify-center items-center flex-col">
+        <p className="font-bold text-2xl text-red-700">{error.message}</p>
+        <Link className="hover:underline" to={"/sign-in"}>
+          try again
+        </Link>
+      </div>
+    );
+  } else {
+    return <h1>Unknown Error</h1>;
+  }
+}
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
