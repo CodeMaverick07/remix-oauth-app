@@ -50,11 +50,70 @@ export function ErrorBoundary() {
     );
   } else if (error instanceof Error) {
     return (
-      <div className="flex h-screen w-screen justify-center items-center flex-col">
-        <p className="font-bold text-2xl text-red-700">{error.message}</p>
-        <Link className="hover:underline" to={"/sign-in"}>
-          try again
-        </Link>
+      <div className="w-screen flex justify-center items-center h-screen  bg-red-500">
+        <Card className="max-w-md p-8">
+          <CardHeader className="px-0 pt-0">
+            <CardTitle>Create an account</CardTitle>
+            <CardDescription>
+              Use your email or another service to continue
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-5 px-0 pb-0">
+            <Form method="post" className=" flex flex-col space-y-2">
+              <div className="flex flex-col gap-1">
+                {" "}
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="email"
+                  className="bg-white border p-3 border-gray-300 focus:border-2 focus:border-black rounded-md outline-none"
+                />
+                <div className="text-sm text-red-700"></div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                {" "}
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="password"
+                  className="bg-white border p-3 border-gray-300 focus:border-black focus:border-2 rounded-md outline-none"
+                />
+                <div className="text-sm text-red-700"></div>
+              </div>
+              <div className="text-sm text-red-700">{error.message}</div>
+
+              <Button type="submit" variant="primary">
+                Sign-in
+              </Button>
+            </Form>
+
+            <Separator />
+
+            <div className="flex flex-col gap-y-2.5">
+              <Link to={"/auth/google"}>
+                <Button variant="outline" size="lg" className="w-full relative">
+                  <FcGoogle className="mr-2 size-5 top-2.5 left-2.5 absolute" />
+                  Continue with Google
+                </Button>
+              </Link>
+              <Link to={"/auth/github"}>
+                <Button variant="outline" size="lg" className="w-full relative">
+                  <FaGithub className="mr-2 size-5 top-2.5 left-2.5 absolute" />
+                  Continue with Github
+                </Button>
+              </Link>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              dont have an account?{" "}
+              <Link to="/sign-up">
+                <span className="text-sky-700 hover:underline">Sign up</span>
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   } else {
