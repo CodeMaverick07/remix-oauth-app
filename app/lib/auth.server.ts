@@ -20,7 +20,7 @@ const registerFormStratergy = new FormStrategy(async ({ form }) => {
 
   if (!user) {
     try {
-      const user = db.user.create({
+      const user = await db.user.create({
         data: {
           email: email as string,
           name: name as string,
@@ -34,7 +34,6 @@ const registerFormStratergy = new FormStrategy(async ({ form }) => {
     }
   } else {
     throw new AuthorizationError("user alredy exits");
-    return;
   }
 });
 
