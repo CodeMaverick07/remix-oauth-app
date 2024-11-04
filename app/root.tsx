@@ -11,8 +11,9 @@ import classNames from "classnames";
 
 import styles from "./tailwind.css?url";
 
-import { FaCcDiscover, FaHome, FaProductHunt } from "react-icons/fa";
-import { FcSettings } from "react-icons/fc";
+import { AiOutlineHome } from "react-icons/ai";
+import { CiImageOn } from "react-icons/ci";
+import { IoBookOutline, IoSettingsOutline } from "react-icons/io5";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -38,7 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="flex h-screen">
+      <body className="flex max-md:flex-col h-screen">
         {children}
 
         <ScrollRestoration />
@@ -51,23 +52,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <>
-      <nav className="bg-blue-600 text-white w-20">
-        <ul className="flex flex-col ">
+      <nav className="bg-blue-600 text-white">
+        <ul className="flex  justify-around items-center md:flex-col">
           <AppNavLink to="/">
-            <FaHome />
+            <AiOutlineHome />
           </AppNavLink>
           <AppNavLink to="discover">
-            <FaCcDiscover />
+            <CiImageOn />
           </AppNavLink>
-          <AppNavLink to="app">
-            <FaProductHunt />
+          <AppNavLink to="app/pantry">
+            <IoBookOutline />
           </AppNavLink>
           <AppNavLink to="settings">
-            <FcSettings />
+            <IoSettingsOutline />
           </AppNavLink>
         </ul>
       </nav>
-      <Outlet />
+      <div className="p-4 w-full">
+        {" "}
+        <Outlet />
+      </div>
     </>
   );
 }
@@ -85,7 +89,7 @@ function AppNavLink({
         {({ isActive }) => (
           <div
             className={classNames(
-              "p-4 text-4xl flex justify-center hover:bg-blue-400",
+              "p-4 w-full text-3xl flex justify-center hover:bg-blue-400",
               {
                 "bg-blue-400": isActive,
               }

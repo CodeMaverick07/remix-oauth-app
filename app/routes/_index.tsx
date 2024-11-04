@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+
 import { loginAuthenticator } from "~/lib/auth.server";
 
 export const meta: MetaFunction = () => {
@@ -20,15 +20,5 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Index() {
-  return (
-    <Form method="POST">
-      <button
-        name="action"
-        value="logout"
-        className="bg-red-700 text-white font-bold p-2 rounded-xl"
-      >
-        Signout
-      </button>
-    </Form>
-  );
+  return <div className="">home</div>;
 }
