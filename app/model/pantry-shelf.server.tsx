@@ -1,4 +1,5 @@
 import { db } from "~/lib/db.server";
+import { handleDelete } from "~/lib/utils";
 
 export async function getAllShelves(query: string | null) {
   return await db.pantryShelf.findMany({
@@ -19,10 +20,13 @@ export async function createShelves({ name }: { name: string }) {
   });
 }
 
-export async function deleteShelve({ id }: { id: string }) {
-  console.log(id, "form the outside action");
-  if (!id) {
-    return null;
-  }
-  return await db.pantryShelf.delete({ where: { id } });
+export async function deleteShelve(id: string) {
+  return await handleDelete(() => db.pantryShelf.delete({ where: { id } }));
+}
+
+export async function changeShelfName(id: string, name: string) {
+  return await db.pantryShelf.update({
+    where: { id },
+    data: { name },
+  });
 }
