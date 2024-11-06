@@ -29,6 +29,8 @@ import { MdDeleteOutline } from "react-icons/md";
 import { string, z } from "zod";
 import { validateForm } from "~/utils/validation";
 import { createShelfItem, deleteShelfItem } from "~/model/pantry-item.server";
+import React from "react";
+import { useServerLayoutEffect } from "~/lib/utils";
 
 export const loader: LoaderFunction = async ({
   request,
@@ -154,7 +156,7 @@ const Pantry = () => {
       ) : (
         <ul
           className={classNames(
-            "flex gap-8 overflow-x-auto mt-4",
+            "flex items-start gap-8 overflow-x-auto mt-4",
             "snap-x snap-mandatory md:snap-none"
           )}
         >
@@ -181,19 +183,23 @@ interface shelfProps {
 }
 
 function Shelf({ shelf }: shelfProps) {
-  const deleteFetcher = useFetcher();
+  const deleteShelfFetcher = useFetcher();
   const changeShelfNameFetcher = useFetcher();
   const createShelfItemFetcher = useFetcher();
+  const { renderedItems, addItem } = useOptimisticItems(
+    shelf.items,
+    createShelfItemFetcher.state
+  );
   const isDeletingShelf =
-    deleteFetcher.formData?.get("action") == "deleteShelf" &&
-    deleteFetcher.formData?.get("deleteId") == shelf.id;
+    deleteShelfFetcher.formData?.get("action") == "deleteShelf" &&
+    deleteShelfFetcher.formData?.get("deleteId") == shelf.id;
 
   return isDeletingShelf ? null : (
     <li
       className={classNames(
-        "border-2 border-black rounded-md p-4",
+        "border-2 border-black rounded-md p-4 h-auto",
         "w-[calc(100vw-2rem)] flex-none snap-center mb-2",
-        "md:w-96 "
+        "md:w-96"
       )}
       key={shelf.id}
     >
@@ -226,7 +232,14 @@ function Shelf({ shelf }: shelfProps) {
           <input type="text" hidden defaultValue={shelf.id} name="shelfId" />
         </changeShelfNameFetcher.Form>
 
-        <deleteFetcher.Form method="post">
+        <deleteShelfFetcher.Form
+          method="post"
+          onSubmit={(event: any) => {
+            if (!confirm("are you sure you want to delete this shelf?")) {
+              event.preventDefault();
+            }
+          }}
+        >
           <input type="text" hidden defaultValue={shelf.id} name="deleteId" />
           <button
             disabled={isDeletingShelf}
@@ -237,9 +250,19 @@ function Shelf({ shelf }: shelfProps) {
           >
             <MdDeleteOutline className="text-3xl text-red-600" />
           </button>
-        </deleteFetcher.Form>
+        </deleteShelfFetcher.Form>
       </div>
-      <createShelfItemFetcher.Form method="post" className="">
+      <createShelfItemFetcher.Form
+        method="post"
+        className=""
+        onSubmit={(event) => {
+          const target = event.target as HTMLFormElement;
+          const itemNameInput = target.elements.namedItem(
+            "itemName"
+          ) as HTMLInputElement;
+          addItem(itemNameInput.value);
+        }}
+      >
         <input
           name="itemName"
           type="text"
@@ -261,27 +284,38 @@ function Shelf({ shelf }: shelfProps) {
       </createShelfItemFetcher.Form>
 
       <ul>
-        {shelf.items.map((item: any) => {
-          return (
-            <li className="mt-4 text-lg font-semibold" key={item.id}>
-              <div className="flex justify-between items-center px-4">
-                <div>{item.name}</div>
-                <Form method="post">
-                  <button type="submit" name="action" value="deleteShelfItem">
-                    <MdDeleteOutline className="text-xl" />
-                  </button>
-                  <input
-                    hidden
-                    type="text"
-                    defaultValue={item.id}
-                    name="itemId"
-                  />
-                </Form>
-              </div>
-            </li>
-          );
+        {renderedItems.map((item: any) => {
+          console.log(item);
+          return <ShelfItem item={item} key={item.id} />;
         })}
       </ul>
+    </li>
+  );
+}
+
+function ShelfItem(item: any) {
+  const deleteShelfItemFetcher = useFetcher();
+  const isDeleteingShelfItem = !!deleteShelfItemFetcher.formData;
+  return isDeleteingShelfItem ? null : (
+    <li className="mt-4 text-lg font-semibold">
+      <div className="flex justify-between items-center px-4">
+        <div>{item.item.name}</div>
+        {item.item.isOptimistic ? (
+          <div></div>
+        ) : (
+          <deleteShelfItemFetcher.Form method="post">
+            <button type="submit" name="action" value="deleteShelfItem">
+              <MdDeleteOutline className="text-xl" />
+            </button>
+            <input
+              hidden
+              type="text"
+              defaultValue={item.item.id}
+              name="itemId"
+            />
+          </deleteShelfItemFetcher.Form>
+        )}
+      </div>
     </li>
   );
 }
@@ -296,3 +330,45 @@ export const ErrorBoundary = () => {
     </div>
   );
 };
+
+type RenderedItem = {
+  name: string;
+  id: string;
+  isOptimistic?: boolean;
+};
+
+function useOptimisticItems(
+  savedItems: Array<RenderedItem>,
+  createShelfItemState: "idle" | "submitting" | "loading"
+) {
+  const [optimisticItems, setOptimisticItems] = React.useState<
+    Array<RenderedItem>
+  >([]);
+
+  const renderedItems = [...optimisticItems, ...savedItems];
+  renderedItems.sort((a, b) => {
+    if (a.name == b.name) return 0;
+    return a.name < b.name ? -1 : 1;
+  });
+
+  useServerLayoutEffect(() => {
+    if (createShelfItemState == "idle") {
+      setOptimisticItems([]);
+    }
+  }, [createShelfItemState]);
+
+  const addItem = (name: string) => {
+    if (name == "") {
+      return;
+    }
+    setOptimisticItems((items) => [
+      ...items,
+      { name: name, id: createItemId(), isOptimistic: true },
+    ]);
+  };
+  return { addItem, renderedItems };
+}
+
+function createItemId() {
+  return `${Math.round(Math.random() * 1_000_000)}`;
+}
