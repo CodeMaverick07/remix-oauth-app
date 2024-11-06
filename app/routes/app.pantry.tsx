@@ -4,7 +4,6 @@ import {
   json,
   LoaderFunction,
   LoaderFunctionArgs,
-  redirect,
 } from "@remix-run/node";
 import {
   useLoaderData,
@@ -32,16 +31,14 @@ import { validateForm } from "~/utils/validation";
 import { createShelfItem, deleteShelfItem } from "~/model/pantry-item.server";
 import React from "react";
 import { useServerLayoutEffect } from "~/lib/utils";
-import { sessionStorage } from "~/lib/session.server";
+import { getSession } from "~/lib/extra/session";
 
 export const loader: LoaderFunction = async ({
   request,
 }: LoaderFunctionArgs) => {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  console.log(session.get("userId"));
+  const session = await getSession();
 
+  console.log(session.get("userId"));
   const url = new URL(request.url).searchParams.get("q");
   const shelves = await getAllShelves(url);
   return json({ shelves });

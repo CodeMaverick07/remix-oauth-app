@@ -1,5 +1,5 @@
 import { ActionFunctionArgs } from "@remix-run/node";
-import { gitHubAuthenticator, googleAuthenticator } from "~/lib/oAuth.server";
+import { gitHubAuthenticator, googleAuthenticator } from "~/lib/extra/oAuth";
 
 export async function loader({ params, request }: ActionFunctionArgs) {
   const value = params["*"];

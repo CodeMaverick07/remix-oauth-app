@@ -1,8 +1,8 @@
 import { Authenticator, AuthorizationError } from "remix-auth";
-import { sessionStorage } from "./session.server";
+import { commitSession, getSession, sessionStorage } from "./session";
 import { FormStrategy } from "remix-auth-form";
-import { db } from "./db.server";
-import { redirect } from "@remix-run/node";
+import { db } from "../db.server";
+import { json } from "@remix-run/node";
 
 const loginAuthenticator = new Authenticator(sessionStorage);
 const registerAuthenticator = new Authenticator(sessionStorage);
@@ -29,16 +29,15 @@ const registerFormStrategy = new FormStrategy(async ({ form, request }) => {
       },
     });
 
-    const session = await sessionStorage.getSession(
-      request.headers.get("Cookie")
-    );
+    const session = await getSession(request.headers.get("Cookie"));
     session.set("userId", user.id);
 
-    const cookie = await sessionStorage.commitSession(session);
-
-    return redirect("/app", {
-      headers: { "Set-Cookie": cookie },
-    });
+    return json(
+      { user },
+      {
+        headers: { "Set-Cookie": await commitSession(session) },
+      }
+    );
   } catch (error) {
     console.error(error);
     throw new AuthorizationError("Failed to register user");
@@ -61,16 +60,14 @@ const loginFormStrategy = new FormStrategy(async ({ form, request }) => {
     throw new AuthorizationError("Password does not match.");
   }
 
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
+  const session = await getSession(request.headers.get("Cookie"));
   session.set("userId", user.id);
-
-  const cookie = await sessionStorage.commitSession(session);
-
-  return redirect("/", {
-    headers: { "Set-Cookie": cookie },
-  });
+  return json(
+    { user },
+    {
+      headers: { "Set-Cookie": await commitSession(session) },
+    }
+  );
 });
 
 loginAuthenticator.use(loginFormStrategy, "form");

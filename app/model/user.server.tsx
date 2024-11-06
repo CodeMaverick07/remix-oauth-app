@@ -1,22 +1,10 @@
-// utils/auth.server.ts
+import {
+  commitSession,
+  sessionStorage as newSession,
+} from "~/lib/extra/session";
 
-import { sessionStorage } from "~/lib/session.server";
-import { db } from "~/lib/db.server";
-import { User } from "@prisma/client"; // adjust if using a different user model
-
-export async function getUser(request: Request): Promise<User | null> {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const userId = session.get("userId");
-
-  if (!userId) {
-    return null;
-  }
-
-  const user = await db.user.findUnique({
-    where: { id: userId },
-  });
-
-  return user;
+export async function setSession(data: string, request: Request) {
+  const session = await newSession.getSession(request.headers.get("Cookie"));
+  session.set("userId", data);
+  await commitSession(session);
 }

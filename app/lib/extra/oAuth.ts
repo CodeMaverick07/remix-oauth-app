@@ -2,8 +2,8 @@
 import { Authenticator, AuthorizationError } from "remix-auth";
 import { GitHubStrategy } from "remix-auth-github";
 import { GoogleStrategy } from "remix-auth-google";
-import { sessionStorage } from "./session.server";
-import { db } from "./db.server";
+import { sessionStorage } from "./session";
+import { db } from "../db.server";
 import { redirect } from "@remix-run/node";
 
 const gitHubAuthenticator = new Authenticator(sessionStorage);

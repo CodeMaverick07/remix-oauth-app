@@ -1,5 +1,5 @@
-import { loginAuthenticator } from "~/lib/auth.server";
-import { gitHubAuthenticator, googleAuthenticator } from "~/lib/oAuth.server";
+import { loginAuthenticator } from "~/lib/extra/auth";
+import { gitHubAuthenticator, googleAuthenticator } from "~/lib/extra/oAuth";
 
 export const authChecker = async ({ request }: { request: Request }) => {
   let user = await googleAuthenticator.isAuthenticated(request);

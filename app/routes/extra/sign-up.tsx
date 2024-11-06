@@ -29,7 +29,7 @@ import {
   LoaderFunction,
   redirect,
 } from "@remix-run/node";
-import { registerAuthenticator } from "~/lib/auth.server";
+import { registerAuthenticator } from "~/lib/extra/auth";
 import { authChecker } from "~/utils/AuthCheck";
 import { validateInput } from "~/lib/utils";
 

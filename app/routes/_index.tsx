@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 
-import { loginAuthenticator } from "~/lib/auth.server";
+import { loginAuthenticator } from "~/lib/extra/auth";
 
 export const meta: MetaFunction = () => {
   return [
