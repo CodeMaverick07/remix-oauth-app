@@ -4,6 +4,7 @@ import {
   json,
   LoaderFunction,
   LoaderFunctionArgs,
+  redirect,
 } from "@remix-run/node";
 import {
   useLoaderData,
@@ -31,14 +32,21 @@ import { validateForm } from "~/utils/validation";
 import { createShelfItem, deleteShelfItem } from "~/model/pantry-item.server";
 import React from "react";
 import { useServerLayoutEffect } from "~/lib/utils";
+import { sessionStorage } from "~/lib/session.server";
 
 export const loader: LoaderFunction = async ({
   request,
 }: LoaderFunctionArgs) => {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+  console.log(session.get("userId"));
+
   const url = new URL(request.url).searchParams.get("q");
   const shelves = await getAllShelves(url);
   return json({ shelves });
 };
+
 const createShelfItemSchema = z.object({
   shelfId: z.string(),
   itemName: z.string().min(1, "Item name is too short"),
@@ -108,6 +116,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 const Pantry = () => {
   const data = useLoaderData<typeof loader>();
+  // Check the commit process and log the result
 
   const navigation = useNavigation();
   const isSearching = navigation.formData?.has("q");
@@ -285,7 +294,6 @@ function Shelf({ shelf }: shelfProps) {
 
       <ul>
         {renderedItems.map((item: any) => {
-          console.log(item);
           return <ShelfItem item={item} key={item.id} />;
         })}
       </ul>

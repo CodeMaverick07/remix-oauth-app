@@ -16,7 +16,7 @@ export async function getAllShelves(query: string | null) {
 
 export async function createShelves({ name }: { name: string }) {
   return await db.pantryShelf.create({
-    data: { name },
+    data: { name, userId: "" },
   });
 }
 

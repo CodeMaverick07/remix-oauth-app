@@ -4,78 +4,96 @@ import { GitHubStrategy } from "remix-auth-github";
 import { GoogleStrategy } from "remix-auth-google";
 import { sessionStorage } from "./session.server";
 import { db } from "./db.server";
+import { redirect } from "@remix-run/node";
 
 const gitHubAuthenticator = new Authenticator(sessionStorage);
 const googleAuthenticator = new Authenticator(sessionStorage);
 
+// GitHub strategy
 const gitHubStrategy = new GitHubStrategy(
   {
     clientId: process.env.GITHUB_CLIENT_ID!,
     clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     redirectURI: process.env.GITHUB_CALLBACK_URL!,
   },
-  async ({ profile }) => {
-    const user = await db.user.findUnique({
-      // Make sure to await this
-      where: {
-        email: profile.emails[0].value as string,
-      },
-    });
+  async ({ profile, request }) => {
+    const email = profile.emails[0].value as string;
+
+    let user = await db.user.findUnique({ where: { email } });
 
     if (!user) {
       try {
-        const newUser = await db.user.create({
+        user = await db.user.create({
           data: {
             name: profile.name.givenName as string,
-            email: profile.emails[0].value as string,
+            email,
             provider: "github",
           },
         });
-        // Log the newly created user
-        return newUser;
       } catch (error: any) {
-        console.error("Error creating user:", error); // Log error for debugging
-        throw new AuthorizationError(error);
+        console.error("Error creating user:", error);
+        throw new AuthorizationError("Error creating user");
       }
-    } else {
-      return user; // Return the existing user
     }
+
+    const session = await sessionStorage.getSession(
+      request.headers.get("Cookie")
+    );
+
+    session.set("userId", user.id);
+
+    const cookie = await sessionStorage.commitSession(session);
+    console.log("Committed cookie:", cookie);
+
+    return redirect("/", {
+      headers: { "Set-Cookie": cookie },
+    });
   }
 );
 
+// Google strategy
 const googleStrategy = new GoogleStrategy(
   {
     clientID: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     callbackURL: process.env.GOOGLE_CALLBACK_URL!,
   },
-  async ({ profile }) => {
-    console.log(profile); // Log the profile to see the returned data
-    const user = await db.user.findUnique({
-      where: {
-        email: profile.emails[0].value as string,
-      },
-    });
+  async ({ profile, request }) => {
+    const email = profile.emails[0].value as string;
+
+    let user = await db.user.findUnique({ where: { email } });
+
     if (!user) {
       try {
-        const newUser = await db.user.create({
+        user = await db.user.create({
           data: {
             name: profile.name.givenName as string,
-            email: profile.emails[0].value as string,
+            email,
             provider: "google",
           },
         });
-        return newUser; // Return the newly created user
       } catch (error: any) {
-        console.error("Error creating user:", error); // Log error for debugging
-        throw new AuthorizationError(error);
+        console.error("Error creating user:", error);
+        throw new AuthorizationError("Error creating user");
       }
-    } else {
-      return user; // Return the existing user
     }
+
+    const session = await sessionStorage.getSession(
+      request.headers.get("Cookie")
+    );
+
+    session.set("userId", user.id);
+
+    const cookie = await sessionStorage.commitSession(session);
+    console.log("Committed cookie:", cookie);
+
+    return redirect("/", {
+      headers: { "Set-Cookie": cookie },
+    });
   }
 );
 
+// Use the strategies for GitHub and Google authentication
 googleAuthenticator.use(googleStrategy, "google");
 gitHubAuthenticator.use(gitHubStrategy, "github");
 

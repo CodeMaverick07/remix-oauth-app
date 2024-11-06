@@ -14,6 +14,7 @@ import styles from "./tailwind.css?url";
 import { AiOutlineHome } from "react-icons/ai";
 import { CiImageOn } from "react-icons/ci";
 import { IoBookOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoIosLogIn } from "react-icons/io";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -66,9 +67,12 @@ export default function App() {
           <AppNavLink to="settings">
             <IoSettingsOutline />
           </AppNavLink>
+          <AppNavLink to="sign-in">
+            <IoIosLogIn />
+          </AppNavLink>
         </ul>
       </nav>
-      <div className="p-4 w-full md:w-[calc(100%-4rem)]">
+      <div className="w-full md:w-[calc(100%-4rem)]">
         {" "}
         <Outlet />
       </div>

@@ -6,6 +6,7 @@ export async function createShelfItem(shelfId: string, name: string) {
     data: {
       name,
       shelfId,
+      userId: "",
     },
   });
 }

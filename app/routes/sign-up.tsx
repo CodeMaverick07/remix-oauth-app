@@ -47,104 +47,6 @@ type actionDataInterface = {
   errors?: Record<string, string>;
 };
 
-export function ErrorBoundary() {
-  const error = useRouteError();
-
-  if (isRouteErrorResponse(error)) {
-    return (
-      <div className="w-full h-screen flex flex-col justify-center items-center">
-        <h1 className=" font-bold text-5xl text-red-700">
-          {error.status} {error.statusText}
-        </h1>
-        <p className="font-semibold text-xl">{error.data.message}</p>
-        <Link to={"/sign-in"} className="text-semibold">
-          try again
-        </Link>
-      </div>
-    );
-  } else if (error instanceof Error) {
-    return (
-      <div className="w-screen flex justify-center items-center h-screen  bg-red-500">
-        <Card className="max-w-md p-8">
-          <CardHeader className="px-0 pt-0">
-            <CardTitle>Create an account</CardTitle>
-            <CardDescription>
-              Use your email or another service to continue
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-5 px-0 pb-0">
-            <Form method="post" className=" flex flex-col space-y-2">
-              <div className="flex flex-col gap-1">
-                {" "}
-                <input
-                  type="text"
-                  name="name"
-                  className="bg-white border p-3 border-gray-300 focus:border-2 focus:border-black rounded-md outline-none"
-                  placeholder="name"
-                />
-                <div className="text-sm text-red-700"></div>
-              </div>
-              <div className="flex flex-col gap-1">
-                {" "}
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="email"
-                  className="bg-white border p-3 border-gray-300 focus:border-2 focus:border-black rounded-md outline-none"
-                />
-                <div className="text-sm text-red-700"></div>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                {" "}
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="password"
-                  className="bg-white border p-3 border-gray-300 focus:border-black focus:border-2 rounded-md outline-none"
-                />
-                <div className="text-sm text-red-700"></div>
-              </div>
-              <div className="text-sm text-red-700">{error.message}</div>
-
-              <Button type="submit" variant="primary">
-                Sign-up
-              </Button>
-            </Form>
-
-            <Separator />
-
-            <div className="flex flex-col gap-y-2.5">
-              <Link to={"/auth/google"}>
-                <Button variant="outline" size="lg" className="w-full relative">
-                  <FcGoogle className="mr-2 size-5 top-2.5 left-2.5 absolute" />
-                  Continue with Google
-                </Button>
-              </Link>
-              <Link to={"/auth/github"}>
-                <Button variant="outline" size="lg" className="w-full relative">
-                  <FaGithub className="mr-2 size-5 top-2.5 left-2.5 absolute" />
-                  Continue with Github
-                </Button>
-              </Link>
-            </div>
-
-            <p className="text-xs text-muted-foreground">
-              Already have an account?{" "}
-              <Link to="/sign-in">
-                <span className="text-sky-700 hover:underline">Sign in</span>
-              </Link>
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  } else {
-    return <h1>Unknown Error</h1>;
-  }
-}
-
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
@@ -180,9 +82,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 const SignUpCard = () => {
   const actionData: actionDataInterface | undefined = useActionData();
-  console.log();
   return (
-    <div className="w-screen flex justify-center items-center h-screen  bg-red-500">
+    <div className="flex justify-center items-center h-screen  bg-gray-400">
       <Card className="max-w-md p-8">
         <CardHeader className="px-0 pt-0">
           <CardTitle>Create an account</CardTitle>
@@ -267,3 +168,101 @@ const SignUpCard = () => {
 };
 
 export default SignUpCard;
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="w-full h-screen flex flex-col justify-center items-center">
+        <h1 className=" font-bold text-5xl text-red-700">
+          {error.status} {error.statusText}
+        </h1>
+        <p className="font-semibold text-xl">{error.data.message}</p>
+        <Link to={"/sign-in"} className="text-semibold">
+          try again
+        </Link>
+      </div>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <div className="flex justify-center items-center h-screen  bg-gray-400">
+        <Card className="max-w-md p-8">
+          <CardHeader className="px-0 pt-0">
+            <CardTitle>Create an account</CardTitle>
+            <CardDescription>
+              Use your email or another service to continue
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-5 px-0 pb-0">
+            <Form method="post" className=" flex flex-col space-y-2">
+              <div className="flex flex-col gap-1">
+                {" "}
+                <input
+                  type="text"
+                  name="name"
+                  className="bg-white border p-3 border-gray-300 focus:border-2 focus:border-black rounded-md outline-none"
+                  placeholder="name"
+                />
+                <div className="text-sm text-red-700"></div>
+              </div>
+              <div className="flex flex-col gap-1">
+                {" "}
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="email"
+                  className="bg-white border p-3 border-gray-300 focus:border-2 focus:border-black rounded-md outline-none"
+                />
+                <div className="text-sm text-red-700"></div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                {" "}
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="password"
+                  className="bg-white border p-3 border-gray-300 focus:border-black focus:border-2 rounded-md outline-none"
+                />
+                <div className="text-sm text-red-700"></div>
+              </div>
+              <div className="text-sm text-red-700">{error.message}</div>
+
+              <Button type="submit" variant="primary">
+                Sign-up
+              </Button>
+            </Form>
+
+            <Separator />
+
+            <div className="flex flex-col gap-y-2.5">
+              <Link to={"/auth/google"}>
+                <Button variant="outline" size="lg" className="w-full relative">
+                  <FcGoogle className="mr-2 size-5 top-2.5 left-2.5 absolute" />
+                  Continue with Google
+                </Button>
+              </Link>
+              <Link to={"/auth/github"}>
+                <Button variant="outline" size="lg" className="w-full relative">
+                  <FaGithub className="mr-2 size-5 top-2.5 left-2.5 absolute" />
+                  Continue with Github
+                </Button>
+              </Link>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Already have an account?{" "}
+              <Link to="/sign-in">
+                <span className="text-sky-700 hover:underline">Sign in</span>
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  } else {
+    return <h1>Unknown Error</h1>;
+  }
+}
